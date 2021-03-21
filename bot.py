@@ -1,19 +1,16 @@
-# - *- coding: utf- 8 - *-
 import telebot
 import config
 import requests
 import json
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-
+import googletrans
+from googletrans import Translator
 from telebot import types
+
 bot = telebot.TeleBot(config.TOKEN)
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
-    sti = open('TgBot/sticker.webp', 'rb')
+    sti = open('pic/sticker.webp', 'rb')
     bot.send_sticker(message.chat.id, sti)
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -33,12 +30,13 @@ surname = '';
 age = 0;
 apod = '';
 apodtext = '';
+apodru = '';
 
 @bot.message_handler(content_types=['text'])
 def onetwothree(message):
 	if message.chat.type == 'private':
 		if message.text == '📰Покажи IT ресурсы📰':
-			bot.send_message(message.chat.id, "1) habrahabr.ru - Информационный ресурс, ориентированный на самую широкую аудиторию IT — от новичка до профессионала.\n2) comnews.ru - Эжедневная газета в сфере IT  \n3) appleinsider.ru - Объемный интернет ресурс для владельцев техники Apple \n4) ferra.ru - российский журнал о потребительской электронике.")
+			bot.send_message(message.chat.id, "habrahabr.ru - Информационный ресурс, ориентированный на самую широкую аудиторию IT — от новичка до профессионала.\ncomnews.ru - Эжедневная газета в сфере IT\nappleinsider.ru - Объемный интернет ресурс для владельцев техники Apple\nferra.ru - российский журнал о потребительской электронике.")
 		elif message.text == '📚Изучение Программирования📚':
 			bot.send_message(message.chat.id, "ru.bitdegree.org - Сайт, предлагающий массу бесплатных курсов, которые варьируются от программирования до разработки игр.\nwww.coursera.org - Coursera предоставляет курсы, учебные пособия и ресурсы по программированию от преподавателей ведущих университетов. На выбор вы найдёте сотни различных курсов, связанных с разработкой.\nwww.codecademy.com - один из самых популярных сайтов, где люди учатся программировать бесплатнo.\nwww.edx.org - массовая платформа с открытым исходным кодом для получения высшего образования.\nwww.codewars.com - Научит вас интересующему языку программирования с помощью комплекса задач для решения. Эти связанные с написанием кода задачи организованы по типу боевых искусств, каждая задача называется ката.")
 		elif message.text == '🧘🏻Релакс🧘🏻':
@@ -47,8 +45,10 @@ def onetwothree(message):
 			response = requests.get("https://api.nasa.gov/planetary/apod?api_key=AVqwbKdbgZo8e3gCrlhJKOc2a3303sh5lDEYdDLs")
 			apod = response.json()["url"]
 			apodtext = response.json()["explanation"]
+			translator = Translator()
+			apodru = translator.translate(apodtext, dest='ru')
 			bot.send_message(message.chat.id, apod)
-			bot.send_message(message.chat.id, apodtext)
+			bot.send_message(message.chat.id, apodru.text)
 		elif message.text == 'Закрыть':
 			markup = types.ReplyKeyboardRemove(selective=False)
 			bot.send_message(message.chat.id, 'sdelano', reply_markup=markup)
